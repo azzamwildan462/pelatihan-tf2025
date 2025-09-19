@@ -1,0 +1,121 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\begin{document}
+
+% ROS 2 Robotics Training Module: Navigation and Localization with RTAB-Map
+
+% Introduction
+
+\section*{Introduction}
+This training program is designed for students with basic ROS 2 knowledge. It focuses on navigation, localization, waypoint navigation, and mission control using state machines. The course uses TurtleBot simulation and RTAB-Map.
+
+% Module 1
+\section{Module 1: Introduction \& Setup}
+\textbf{Objectives:}
+\begin{itemize}
+  \item Install ROS 2 and TurtleBot3 packages
+  \item Setup workspace and simulation environment (Gazebo + RViz)
+  \item Verify sensor topics (LiDAR, odometry, camera)
+\end{itemize}
+\textbf{Exercises:}
+\begin{itemize}
+  \item Create ROS 2 workspace and build
+  \item Run TurtleBot3 simulation world
+  \item Check sensor topics with \texttt{ros2 topic list}
+\end{itemize}
+
+% Module 2
+\section{Module 2: Mapping with RTAB-Map}
+\textbf{Objectives:}
+\begin{itemize}
+  \item Understand SLAM and RTAB-Map
+  \item Run RTAB-Map in simulation
+  \item Save and load maps
+\end{itemize}
+\textbf{Exercises:}
+\begin{itemize}
+  \item Launch TurtleBot3 with RTAB-Map
+  \item Explore environment to build map
+  \item Save map using \texttt{ros2 run nav2\_map\_server map\_saver\_cli}
+\end{itemize}
+
+% Module 3
+\section{Module 3: Localization with RTAB-Map}
+\textbf{Objectives:}
+\begin{itemize}
+  \item Use pre-built maps for localization
+  \item Understand TF tree: map $\rightarrow$ odom $\rightarrow$ base\_link
+\end{itemize}
+\textbf{Exercises:}
+\begin{itemize}
+  \item Launch localization node with map.yaml
+  \item Move robot and verify pose in RViz
+\end{itemize}
+
+% Module 4
+\section{Module 4: Navigation with Nav2}
+\textbf{Objectives:}
+\begin{itemize}
+  \item Learn Navigation2 stack
+  \item Configure global and local planners
+  \item Tune costmap parameters
+\end{itemize}
+\textbf{Exercises:}
+\begin{itemize}
+  \item Launch nav2\_bringup with TurtleBot
+  \item Send a navigation goal in RViz
+  \item Observe path planning and execution
+\end{itemize}
+
+% Module 5
+\section{Module 5: Waypoint Navigation}
+\textbf{Objectives:}
+\begin{itemize}
+  \item Define and manage multiple waypoints
+  \item Create patrol behavior using waypoints
+\end{itemize}
+\textbf{Exercises:}
+\begin{itemize}
+  \item Write Python node to send multiple goals
+  \item Test waypoint navigation in simulation
+\end{itemize}
+
+% Module 6
+\section{Module 6: State Machines for Mission Control}
+\textbf{Objectives:}
+\begin{itemize}
+  \item Understand state machines in robotics
+  \item Implement mission logic with SMACH or FlexBE
+\end{itemize}
+\textbf{Exercises:}
+\begin{itemize}
+  \item Create simple state machine with two states
+  \item Expand mission with patrol $\rightarrow$ detect $\rightarrow$ return
+\end{itemize}
+
+% Module 7
+\section{Module 7: Advanced Topics \& Real Robot Integration}
+\textbf{Objectives:}
+\begin{itemize}
+  \item Handle kidnapped robot problem
+  \item Fuse IMU + odometry + RTAB-Map
+  \item Deploy to a real TurtleBot
+\end{itemize}
+\textbf{Exercises:}
+\begin{itemize}
+  \item Test re-localization after manual robot displacement
+  \item Run mapping on physical TurtleBot
+\end{itemize}
+
+% Final Project
+\section*{Final Project}
+Students implement a complete mission-based program:
+\begin{itemize}
+  \item Explore and build map with RTAB-Map
+  \item Localize using saved map
+  \item Patrol using waypoints
+  \item Implement mission logic with state machine
+\end{itemize}
+
+\end{document}
