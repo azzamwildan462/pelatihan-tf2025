@@ -66,6 +66,9 @@ Pada sidebar ditunjukkan TF yang dimiliki robot:
   \item \texttt{base\_scan}: frame laser scan
   \item \texttt{wheel\_left\_link}: frame roda kiri
   \item \texttt{wheel\_right\_link}: frame roda kanan
+  \item \texttt{camera\_link}: frame dasar kamera (body), menunjukkan posisi fisik kamera pada robot. Orientasi mengikuti konvensi ROS, yaitu $x$ ke depan, $y$ ke kiri, dan $z$ ke atas.
+  \item \texttt{camera\_rgb\_frame}: frame kamera RGB (sensor), digunakan sebagai acuan untuk data gambar. Orientasinya sama dengan \texttt{camera\_link}.
+  \item \texttt{camera\_rgb\_optical\_frame}: frame kamera dengan konvensi optik. Orientasi mengikuti standar OpenCV, yaitu $z$ ke depan, $x$ ke kanan, dan $y$ ke bawah.
 \end{itemize}
 Semua TF tersebut terhubung dalam sebuah pohon (tree) yang dapat dilihat pada tab \texttt{TF} di RViz2. atau dengan perintah:
 \begin{verbatim}
@@ -75,7 +78,7 @@ Perintah ini akan menghasilkan file \texttt{frames.pdf} yang menunjukkan struktu
 \begin{figure}[H]
   \centering
   \includegraphics[width=1\textwidth]{tf_tree.png}
-  \caption{Contoh pohon TF}
+  \caption{Contoh TF Tree}
 \end{figure}
 
 
@@ -120,46 +123,6 @@ Perintah ini akan menghasilkan file \texttt{frames.pdf} yang menunjukkan struktu
   \item Launch nav2\_bringup with TurtleBot
   \item Send a navigation goal in RViz
   \item Observe path planning and execution
-\end{itemize}
-
-% Module 5
-\section{Module 5: Waypoint Navigation}
-\textbf{Objectives:}
-\begin{itemize}
-  \item Define and manage multiple waypoints
-  \item Create patrol behavior using waypoints
-\end{itemize}
-\textbf{Exercises:}
-\begin{itemize}
-  \item Write Python node to send multiple goals
-  \item Test waypoint navigation in simulation
-\end{itemize}
-
-% Module 6
-\section{Module 6: State Machines for Mission Control}
-\textbf{Objectives:}
-\begin{itemize}
-  \item Understand state machines in robotics
-  \item Implement mission logic with SMACH or FlexBE
-\end{itemize}
-\textbf{Exercises:}
-\begin{itemize}
-  \item Create simple state machine with two states
-  \item Expand mission with patrol $\rightarrow$ detect $\rightarrow$ return
-\end{itemize}
-
-% Module 7
-\section{Module 7: Advanced Topics \& Real Robot Integration}
-\textbf{Objectives:}
-\begin{itemize}
-  \item Handle kidnapped robot problem
-  \item Fuse IMU + odometry + RTAB-Map
-  \item Deploy to a real TurtleBot
-\end{itemize}
-\textbf{Exercises:}
-\begin{itemize}
-  \item Test re-localization after manual robot displacement
-  \item Run mapping on physical TurtleBot
 \end{itemize}
 
 % Final Project
