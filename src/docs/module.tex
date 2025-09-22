@@ -1,32 +1,86 @@
 \documentclass{article}
 \usepackage{amsmath}
 \usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[a4paper, margin=1in]{geometry}
 \begin{document}
 
 % ROS 2 Robotics Training Module: Navigation and Localization with RTAB-Map
 
 % Introduction
 
-\section*{Introduction}
-This training program is designed for students with basic ROS 2 knowledge. It focuses on navigation, localization, waypoint navigation, and mission control using state machines. The course uses TurtleBot simulation and RTAB-Map.
+\section*{Modul Pelatihan Teaching Factory Programming: Navigasi dan Lokalisasi dengan RTAB-Map}
+Program pelatihan ini dirancang untuk mahasiswa yang sudah memiliki pengetahuan dasar tentang ROS2.
+Fokus pelatihan adalah pada navigasi, lokalisasi, navigasi waypoint, dan pengendalian misi menggunakan state machine.
+Pelatihan ini menggunakan simulasi TurtleBot dan RTAB-Map.
 
 % Module 1
-\section{Module 1: Introduction \& Setup}
-\textbf{Objectives:}
+\section{Modul 1: Setup \& Installasi}
+
+\subsection{Konfigurasi Environment}
 \begin{itemize}
-  \item Install ROS 2 and TurtleBot3 packages
-  \item Setup workspace and simulation environment (Gazebo + RViz)
-  \item Verify sensor topics (LiDAR, odometry, camera)
-\end{itemize}
-\textbf{Exercises:}
-\begin{itemize}
-  \item Create ROS 2 workspace and build
-  \item Run TurtleBot3 simulation world
-  \item Check sensor topics with \texttt{ros2 topic list}
+  \item Install ROS 2 Humble
+        lakukan installasi menggunakan \href{https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html}{\textbf{panduan instalasi Debian}}
+  \item Install TurtleBot3 packages menggunakan \href{https://emanual.robotis.com/docs/en/platform/turtlebot3/quick-start/#installing-turtlebot3-packages}{\textbf{panduan instalasi TurtleBot3}}
+  \item Install Gazebo dengan \texttt{sudo apt install ros-humble-desktop}
+  \item Install RViz2 dengan \texttt{sudo apt install ros-humble-rviz2}
+  \item Install RTAB-Map dengan \texttt{sudo apt install ros-humble-rtabmap-ros}
+  \item Install Navigation2 dengan \texttt{sudo apt install ros-humble-navigation2 ros-humble-nav2-bringup}
 \end{itemize}
 
+\subsection{Menjalankan Simulasi}
+Setelah semua paket terinstal, jalankan simulasi TurtleBot3 Waffle Pi di Gazebo dengan environment \texttt{house}:
+\begin{verbatim}
+export TURTLEBOT3_MODEL=waffle_pi
+ros2 launch turtlebot3_gazebo turtlebot3_house.launch.py
+\end{verbatim}
+
+\subsection{Teleoperation}
+Buka terminal lain untuk menjalankan teleop:
+\begin{verbatim}
+ros2 run turtlebot3_teleop teleop_keyboard
+\end{verbatim}
+
+\subsection{RViz2}
+Buka RViz2 untuk melihat topik yang dipublish dan TF yang dimiliki robot:
+\begin{verbatim}
+rviz2
+\end{verbatim}
+Atur Fixed Frame ke \texttt{odom}.
+Tambahkan display untuk \texttt{LaserScan}, dan \texttt{TF}.
+Sehingga akan muncul tampilan seperti berikut:
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{rviz2.png}
+  \caption{Contoh tampilan RViz2}
+\end{figure}
+
+Pada sidebar ditunjukkan TF yang dimiliki robot:
+\begin{itemize}
+  \item \texttt{odom}: frame odometri, bergerak relatif terhadap \texttt{base\_link}
+  \item \texttt{base\_footprint}: frame footprint robot (sejajar dengan ground plane 2D)
+  \item \texttt{base\_link}: frame utama robot (dapat mengalami translasi dan orientasi)
+  \item \texttt{caster\_back\_link}: frame caster back (free wheel)
+  \item \texttt{imu\_link}: frame IMU
+  \item \texttt{base\_scan}: frame laser scan
+  \item \texttt{wheel\_left\_link}: frame roda kiri
+  \item \texttt{wheel\_right\_link}: frame roda kanan
+\end{itemize}
+Semua TF tersebut terhubung dalam sebuah pohon (tree) yang dapat dilihat pada tab \texttt{TF} di RViz2. atau dengan perintah:
+\begin{verbatim}
+ros2 run tf2_tools view_frames.py
+\end{verbatim}
+Perintah ini akan menghasilkan file \texttt{frames.pdf} yang menunjukkan struktur pohon TF sebagai berikut:
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{tf_tree.png}
+  \caption{Contoh pohon TF}
+\end{figure}
+
+
 % Module 2
-\section{Module 2: Mapping with RTAB-Map}
+\section{Modul 2: Mapping dengan RTAB-Map}
 \textbf{Objectives:}
 \begin{itemize}
   \item Understand SLAM and RTAB-Map

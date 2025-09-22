@@ -1,0 +1,357 @@
+% pelatihan_rtabmap.tex
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[bahasai]{babel}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{bookmark}
+\usepackage{graphicx}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage{caption}
+\geometry{margin=2.2cm}
+
+% Header/footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Pelatihan ROS 2 — RTAB-Map \& Navigation}
+\fancyhead[R]{TurtleBot3, ROS 2 Humble}
+\fancyfoot[C]{\thepage}
+
+% code listing style
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  captionpos=b,
+  columns=fullflexible,
+  numbers=left,
+  numberstyle=\tiny,
+  keywordstyle=\color{blue}\bfseries,
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{orange}
+}
+
+% Title
+\title{\Huge\bfseries Modul Pelatihan\\ROS 2: Mapping \& Navigation dengan RTAB-Map}
+\author{Disusun oleh: Gemini (Asisten AI) \\ Untuk: Pelatihan Robotika (TurtleBot3)}
+\date{22 September 2025}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section*{Ringkasan}
+Modul ini dirancang untuk siswa yang sudah paham dasar ROS 2 dan ingin mendalami navigasi otonom, pemetaan dan lokalisasi menggunakan \textbf{RTAB-Map} pada platform \textbf{TurtleBot3 (simulasi Gazebo)}. Setiap modul berisi teori singkat, langkah-langkah praktis, contoh perintah/launch, latihan, dan penilaian.
+
+\section{Learning Outcomes (Hasil Belajar)}
+Setelah menyelesaikan modul ini, peserta akan mampu:
+\begin{itemize}
+    \item Memahami konsep SLAM dan cara kerja RTAB-Map.
+    \item Menghasilkan peta lingkungan simulasi dan menyimpannya.
+    \item Melakukan lokalisasi terhadap peta yang tersimpan.
+    \item Mengonfigurasi dan menjalankan Navigation2 untuk mencapai goal.
+    \item Membuat node waypoint untuk misi berurut.
+    \item Mendesain state machine sederhana untuk kontrol misi.
+    \item Mendeploy (secara simulasi/nyata) program misi terpadu.
+\end{itemize}
+
+\section{Overview Modul dan Durasi}
+\begin{longtable}{p{3.5cm} p{10cm}}
+    Module                             & Durasi (saran) \\
+    \hline
+    Introduction \& Setup              & 2 jam          \\
+    Mapping with RTAB-Map              & 3 jam          \\
+    Localization with RTAB-Map         & 2 jam          \\
+    Navigation with Nav2               & 3 jam          \\
+    Waypoint Navigation                & 2 jam          \\
+    State Machines for Mission Control & 3 jam          \\
+    Advanced Topics \& Deployment      & 2 jam          \\
+    Final Project                      & 6--8 jam (tim) \\
+\end{longtable}
+
+\newpage
+\section{Module 1: Introduction \& Setup}
+\subsection*{Tujuan}
+\begin{itemize}
+    \item Menyiapkan environment ROS 2 Humble dan TurtleBot3 (simulasi).
+    \item Menjalankan Gazebo dan RViz, verifikasi topik sensor.
+\end{itemize}
+
+\subsection*{Langkah Praktis (singkat)}
+\begin{enumerate}
+    \item Buat workspace:
+          \begin{lstlisting}[language=bash]
+mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws
+colcon build
+source /opt/ros/humble/setup.bash
+source install/setup.bash
+\end{lstlisting}
+    \item Install paket TurtleBot3 \& RTAB-Map (contoh):
+          \begin{lstlisting}[language=bash]
+sudo apt update
+sudo apt install ros-humble-turtlebot3-gazebo \
+  ros-humble-rtabmap-ros ros-humble-nav2-bringup
+\end{lstlisting}
+    \item Jalankan world simulasi:
+          \begin{lstlisting}[language=bash]
+export TURTLEBOT3_MODEL=burger
+ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py
+\end{lstlisting}
+    \item Cek topics:
+          \begin{lstlisting}[language=bash]
+ros2 topic list
+ros2 topic echo /scan
+ros2 topic echo /odom
+\end{lstlisting}
+\end{enumerate}
+
+\subsection*{Latihan}
+\begin{itemize}
+    \item Jalankan robot di Gazebo, gunakan teleop untuk menggerakkan dan amati topik sensor di terminal.
+\end{itemize}
+
+\newpage
+\section{Module 2: Mapping with RTAB-Map}
+\subsection*{Tujuan}
+\begin{itemize}
+    \item Pahami RTAB-Map dan cara membuat peta visual-LiDAR.
+    \item Simpan dan muat peta.
+\end{itemize}
+
+\subsection*{Langkah Praktis}
+\begin{enumerate}
+    \item Launch RTAB-Map di simulasi:
+          \begin{lstlisting}[language=bash]
+# jalankan gazebo world terlebih dahulu
+ros2 launch rtabmap_ros rtabmap.launch.py \
+  rtabmap_args:="--delete_db_on_start" use_sim_time:=true
+\end{lstlisting}
+    \item Jelajahi environment dengan teleop sampai peta terbentuk.
+    \item Simpan database / peta:
+          \begin{lstlisting}[language=bash]
+ros2 run rtabmap_ros rtabmap-databaseViewer <db_filename>.db
+# atau gunakan service/CLI khusus rtabmap untuk save map (tergantung versi)
+\end{lstlisting}
+    \item Export map ke format YAML (peta untuk Nav2 dapat dibuat dengan map_server jika tersedia).
+\end{enumerate}
+
+\subsection*{Latihan}
+\begin{itemize}
+    \item Bangun peta ruangan lab/simulasi, simpan peta, dan dokumentasikan langkah.
+\end{itemize}
+
+\newpage
+\section{Module 3: Localization with RTAB-Map}
+\subsection*{Tujuan}
+\begin{itemize}
+    \item Lakukan lokalisasi terhadap peta yang tersimpan menggunakan RTAB-Map.
+    \item Pahami TF tree: \texttt{map -> odom -> base_link}.
+\end{itemize}
+
+\subsection*{Langkah Praktis}
+\begin{enumerate}
+    \item Muat peta/DB RTAB-Map lalu jalankan mode localization (lihat dokumentasi rtabmap untuk argumen `--database_path` atau parameter `rtabmap/DatabasePath`).
+          \begin{lstlisting}[language=bash]
+ros2 launch rtabmap_ros rtabmap.launch.py \
+  rtabmap_args:="--database_path /path/to/my_map.db" use_sim_time:=true
+\end{lstlisting}
+    \item Pastikan TF terlihat di RViz: tambahkan display TF, Pose, LaserScan.
+    \item Verifikasi robot tetap terkunci pada pose sesuai peta.
+\end{enumerate}
+
+\subsection*{Latihan}
+\begin{itemize}
+    \item Lakukan \"kidnap test\": pindahkan robot di gazebo manual, cek apakah RTAB-Map bisa re-localize atau perlu re-init.
+\end{itemize}
+
+\newpage
+\section{Module 4: Navigation with Nav2}
+\subsection*{Tujuan}
+\begin{itemize}
+    \item Mengenal Navigation2 (Nav2): planners, controllers, costmap.
+    \item Mengirim goal & observasi path planning.
+\end{itemize}
+
+\subsection*{Langkah Praktis}
+\begin{enumerate}
+    \item Launch Nav2 (contoh):
+          \begin{lstlisting}[language=bash]
+ros2 launch nav2_bringup navigation_launch.py \
+  use_sim_time:=true map:=/path/to/map.yaml
+\end{lstlisting}
+    \item Kirim goal dari RViz2 (Publish Goal).
+    \item Lakukan tuning sederhana pada `costmap_common_params.yaml`:
+          \begin{itemize}
+              \item `inflation_radius`, `obstacle_range`, `raytrace_range`
+              \item `global_planner` vs `local_planner` (contoh: NavFn + DWB)
+          \end{itemize}
+\end{enumerate}
+
+\subsection*{Latihan}
+\begin{itemize}
+    \item Kirim beberapa goal, catat kegagalan dan penyebab (collision, planner failure, tf).
+\end{itemize}
+
+\newpage
+\section{Module 5: Waypoint Navigation}
+\subsection*{Tujuan}
+Buat node untuk mengirimkan serangkaian goal (waypoints) ke Nav2 secara otomatis.
+
+\subsection*{Contoh Python: node pengirim waypoints (template)}
+\begin{lstlisting}[language=python]
+#!/usr/bin/env python3
+import rclpy
+from rclpy.node import Node
+from geometry_msgs.msg import PoseStamped
+from rclpy.duration import Duration
+from rclpy.qos import QoSProfile
+from nav2_msgs.action import NavigateToPose
+from rclpy.action import ActionClient
+
+class WaypointClient(Node):
+    def __init__(self):
+        super().__init__('waypoint_client')
+        self._action_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
+        # Define waypoints (sample)
+        self.waypoints = [
+            {'x':1.0,'y':0.0,'yaw':0.0},
+            {'x':1.0,'y':1.0,'yaw':1.57},
+            {'x':0.0,'y':1.0,'yaw':3.14},
+        ]
+        self.timer = self.create_timer(1.0, self.run)
+
+    def run(self):
+        if not self._action_client.wait_for_server(timeout_sec=2.0):
+            self.get_logger().info('Action server not available yet...')
+            return
+        self.timer.cancel()
+        self.send_waypoints()
+
+    def send_waypoints(self):
+        for wp in self.waypoints:
+            pose = PoseStamped()
+            pose.header.frame_id = 'map'
+            pose.header.stamp = self.get_clock().now().to_msg()
+            pose.pose.position.x = wp['x']
+            pose.pose.position.y = wp['y']
+            # orientation from yaw (simple)
+            from tf_transformations import quaternion_from_euler
+            q = quaternion_from_euler(0,0,wp['yaw'])
+            pose.pose.orientation.x = q[0]
+            pose.pose.orientation.y = q[1]
+            pose.pose.orientation.z = q[2]
+            pose.pose.orientation.w = q[3]
+            # send action request (omitted request building boilerplate for brevity)
+            # see nav2_msgs/NavigateToPose action usage
+            self.get_logger().info(f'Sending waypoint: {wp}')
+        self.get_logger().info('All waypoints sent.')
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = WaypointClient()
+    rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
+\end{lstlisting}
+
+\subsection*{Latihan}
+\begin{itemize}
+    \item Modifikasi waypoint list untuk patroli.
+    \item Tambahkan re-try apabila goal gagal tercapai.
+\end{itemize}
+
+\newpage
+\section{Module 6: State Machines for Mission Control}
+\subsection*{Tujuan}
+Mengatur alur misi (patrol → detect → return) menggunakan state machine.
+
+\subsection*{Pilihan tool}
+\begin{itemize}
+    \item \textbf{smach} (umumnya ROS1, tetapi ada adaptasi/alternatif untuk ROS2) — bila ingin state-machine classic.
+    \item \textbf{FlexBE} — tool GUI untuk behavior execution (support ROS2 via bridge/porting).
+    \item Alternatif sederhana: implementasi state machine manual di Python dengan kelas.
+\end{itemize}
+
+\subsection*{Contoh sederhana state machine (manual Python)}
+\begin{lstlisting}[language=python]
+class MissionStateMachine:
+    def __init__(self):
+        self.state = 'IDLE'
+    def step(self, event=None):
+        if self.state == 'IDLE' and event == 'start':
+            self.state = 'PATROL'
+        elif self.state == 'PATROL' and event == 'target_found':
+            self.state = 'APPROACH'
+        elif self.state == 'APPROACH' and event == 'task_done':
+            self.state = 'RETURN'
+        elif self.state == 'RETURN' and event == 'arrived':
+            self.state = 'IDLE'
+\end{lstlisting}
+
+\subsection*{Latihan}
+\begin{itemize}
+    \item Gabungkan node waypoint dengan state machine: saat state PATROL, jalankan waypoints; jika sensor mendeteksi objek, transit ke APPROACH lalu eksekusi task.
+\end{itemize}
+
+\newpage
+\section{Module 7: Advanced Topics \& Deployment}
+\subsection*{Topik}
+\begin{itemize}
+    \item Kidnapped robot: strategi re-localization dan recovery behavior.
+    \item Sensor fusion: IMU + encoder odometry + RTAB-Map pose.
+    \item Deploying ke TurtleBot fisik: langkah safety, kalibrasi, dan pengecekan.
+\end{itemize}
+
+\subsection*{Latihan}
+\begin{itemize}
+    \item Simulasi kidnapped: hentikan node Nav2, pindahkan robot di Gazebo, jalankan re-localize.
+    \item Jika ada TurtleBot fisik: deploy peta dan jalankan misi sederhana dengan supervisi.
+\end{itemize}
+
+\newpage
+\section{Final Project (Instruksi)}
+\subsection*{Deskripsi}
+Tim mahasiswa membuat program misi lengkap: build map (RTAB-Map) → lokalisi → patroli waypoint → kontrol misi (state machine) → laporkan hasil.
+
+\subsection*{Deliverables}
+\begin{itemize}
+    \item Repository Git berisi launch files, node Python/C++, konfigurasi Nav2, peta (.db/.yaml), dan README.
+    \item Video demonstrasi simulasi (maks 5 menit).
+    \item Laporan 2--4 halaman (PDF) yang merangkum arsitektur, masalah & solusi.
+\end{itemize}
+
+\subsection*{Rubrik Penilaian (contoh)}
+\begin{itemize}
+    \item Sistem bekerja (mapping + localization + waypoint): 40\%
+    \item State machine & robustness: 20\%
+    \item Kualitas kode & dokumentasi: 20\%
+    \item Presentasi & demo: 20\%
+\end{itemize}
+
+\newpage
+\section{Appendix A: Resources \& Referensi}
+\begin{itemize}
+    \item RTAB-Map ROS: \url{http://wiki.ros.org/rtabmap_ros}
+    \item Navigation2: \url{https://navigation.ros.org/}
+    \item TurtleBot3: \url{https://emanual.robotis.com/docs/en/platform/turtlebot3/}
+    \item LaTeX tips: gunakan \texttt{latexmk} atau \texttt{xelatex} untuk compile.
+\end{itemize}
+
+\section{Appendix B: Checklist Persiapan Lab}
+\begin{itemize}
+    \item Installasikan ROS 2 Humble pada semua mesin peserta (atau sediakan VM).
+    \item Pastikan Gazebo & TurtleBot3 packages terpasang.
+    \item Sediakan satu mesin/instruktur yang menjadi host (untuk remote desktop / screen sharing).
+    \item Siapkan sample world & peta (opsional).
+\end{itemize}
+
+\end{document}
