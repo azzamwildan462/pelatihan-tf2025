@@ -50,11 +50,90 @@ def generate_launch_description():
         output='screen',
         respawn=True,
     )
+
     rosapi_node = Node(
         package='rosapi',
         executable='rosapi_node',
         name='rosapi_node',
         output='screen',
+        respawn=True,
+    )
+
+    realsense2_camera_node = Node(
+        package="realsense2_camera",
+        executable="realsense2_camera_node",
+        name="realsense2_camera_node",
+        parameters=[
+            {
+                "enable_color": True,
+                "enable_depth": True,
+                "enable_infra1": False,
+                "enable_infra2": False,
+                "enable_rgbd": False,
+                "enable_mag": False,
+                "enable_sync": True,
+                
+                "enable_accel": True,
+                "enable_gyro": True,
+                "unite_imu_method": 2,
+                "align_depth.enable": True,
+                "pointcloud.enable": True,
+                "initial_reset": False,
+                "gyro_fps": 200,
+                "accel_fps": 200,
+            }
+        ],
+        remappings=[("/imu", "/imu_raw")],
+        arguments=["--ros-args", "--log-level", "error"],
+        respawn=True,
+    )
+
+    imu_filter_madgwick_node = Node(
+        package="imu_filter_madgwick",
+        executable="imu_filter_madgwick_node",
+        name="imu_filter_madgwick_node",
+        parameters=[{"use_mag": False}],
+        remappings=[
+            ("/imu/data_raw", "/camera/realsense2_camera_node/imu"),
+            ("/imu/data", "/imu_filtered"),
+        ],
+        arguments=["--ros-args", "--log-level", "error"],
+        respawn=True,
+    )
+
+    rtabmap_slam_rtabmap = Node(
+        package="rtabmap_slam",
+        executable="rtabmap",
+        name="rtabmap",
+        namespace="slam",
+        parameters=[
+            {
+                "frame_id": "base_link",
+                "map_frame_id": "map",
+                "odom_frame_id": "odom",
+
+                "use_sim_time": False,
+                "Threads": 9, # Added by Azzam
+            }
+        ],
+        remappings=[
+            ("rgb/image", "/camera/realsense2_camera_node/color/image_raw"),
+            ("rgb/camera_info", "/camera/realsense2_camera_node/color/camera_info"),
+            ("depth/image", "/camera/realsense2_camera_node/aligned_depth_to_color/image_raw"),
+            ("scan", "/laserscan"),
+        ],
+        arguments=["--ros-args", "--log-level", "warn"],
+        respawn=True,
+    )
+
+    ds4_driver_node = Node(
+        package="ds4_driver",
+        executable="ds4_driver_node.py",
+        name="ds4_driver_node",
+        remappings=[
+            ("/status", "/ds4/to_pc"),
+            ("/set_feedback", "/ds4/from_pc"),
+        ],
         respawn=True,
     )
 
@@ -109,6 +188,26 @@ def generate_launch_description():
             {
                 "ip": "192.168.50.2",
                 "port": 9798,
+            }
+        ],
+        output="screen",
+        respawn=True,
+    )
+
+    io_lslidar_n301 = Node(
+        package="hardware",
+        executable="io_lslidar_n301",
+        name="io_lslidar_n301",
+        parameters=[
+            {
+                "port_msop": 2368,
+                "port_difop": 2369,
+                "frame_id": "lidar_link",
+                "distance_min": 0.2,
+                "distance_max": 20.0,
+                "azimuth_start": 185.0,
+                "azimuth_stop": 355.0,
+                "azimuth_step": 0.05,
             }
         ],
         output="screen",

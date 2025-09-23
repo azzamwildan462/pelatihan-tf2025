@@ -7,12 +7,18 @@ endif()
 
 # find dependencies
 set(var_dependencies 
-ros2_interface 
-ros2_utils 
-rclcpp)
+  ros2_interface 
+  ros2_utils 
+  rclcpp
+  pcl_conversions
+  rclcpp
+  rclpy
+  sensor_msgs
+)
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(PCL REQUIRED)
 
 foreach(var_dependency ${var_dependencies})
   find_package(${var_dependency} REQUIRED)
@@ -24,9 +30,14 @@ ament_target_dependencies(keyboard_input rclcpp std_msgs)
 add_executable(io_stm32 src/io_stm32.cpp)
 ament_target_dependencies(io_stm32 ${var_dependencies})
 
+add_executable(io_lslidar_n301 src/io_lslidar_n301.cpp)
+ament_target_dependencies(io_lslidar_n301 ${var_dependencies})
+target_link_libraries(io_lslidar_n301 ${PCL_LIBRARIES})
+
 install(TARGETS
   keyboard_input
   io_stm32
+  io_lslidar_n301
   DESTINATION lib/${PROJECT_NAME}
 )
 
