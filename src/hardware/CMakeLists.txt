@@ -6,15 +6,27 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # find dependencies
+set(var_dependencies 
+ros2_interface 
+ros2_utils 
+rclcpp)
+
+# find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(std_msgs REQUIRED)
+
+foreach(var_dependency ${var_dependencies})
+  find_package(${var_dependency} REQUIRED)
+endforeach()
 
 add_executable(keyboard_input src/keyboard_input.cpp)
 ament_target_dependencies(keyboard_input rclcpp std_msgs)
 
+add_executable(io_stm32 src/io_stm32.cpp)
+ament_target_dependencies(io_stm32 ${var_dependencies})
+
 install(TARGETS
   keyboard_input
+  io_stm32
   DESTINATION lib/${PROJECT_NAME}
 )
 
