@@ -1,6 +1,7 @@
 import os
 
 from launch import LaunchDescription
+from launch.actions import EmitEvent, RegisterEventHandler, TimerAction
 from launch_ros.actions import Node
 from launch.actions import SetEnvironmentVariable
 
@@ -137,7 +138,45 @@ def generate_launch_description():
         respawn=True,
     )
 
-    # ======================================================================
+    # ============================ Nav2 ==================================
+
+    # --- Nav2 core (lifecycle nodes), second manager
+    params_file = os.path.join(ws_path,"src/ros2_utils/config/nav2_params.yaml")
+    planner_server = Node(
+        package='nav2_planner', executable='planner_server', name='planner_server',
+        output='screen', parameters=[params_file],
+        respawn=True, respawn_delay=2.0
+    )
+    controller_server = Node(
+        package='nav2_controller', executable='controller_server', name='controller_server',
+        output='screen', parameters=[params_file],
+        respawn=True, respawn_delay=2.0
+    )
+    bt_navigator = Node(
+        package='nav2_bt_navigator', executable='bt_navigator', name='bt_navigator',
+        output='screen', parameters=[params_file],
+        respawn=True, respawn_delay=2.0
+    )
+    behavior_server = Node(
+        package='nav2_behaviors', executable='behavior_server', name='behavior_server',
+        output='screen', parameters=[params_file],
+        respawn=True, respawn_delay=2.0
+    )
+    lifecycle_navigation = Node(
+        package='nav2_lifecycle_manager', executable='lifecycle_manager',
+        name='lifecycle_manager_navigation', output='screen',
+        parameters=[{
+            'use_sim_time': False,
+            'autostart': True,
+            'bond_timeout': 5.0,
+            'node_names': [
+                'planner_server',
+                'controller_server',
+                'bt_navigator',
+                'behavior_server'
+            ]
+        }]
+    )
 
     # ========================== Communication ================================
     wifi_control = Node(
@@ -251,5 +290,16 @@ def generate_launch_description():
             # keyboard_input,
 
             # wifi_control,
+
+            TimerAction(
+                period=10.0,
+                actions=[
+                    # planner_server,
+                    # controller_server,
+                    # bt_navigator,
+                    # behavior_server,
+                    # lifecycle_navigation,
+                ],
+            ),
         ]
     )
