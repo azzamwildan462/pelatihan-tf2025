@@ -115,6 +115,7 @@ def generate_launch_description():
 
                 "use_sim_time": False,
                 "Threads": 9, # Added by Azzam
+                "database_path": os.path.join(ws_path,"../.ros/rtabmap_coba.db"),
             }
         ],
         remappings=[
@@ -136,6 +137,16 @@ def generate_launch_description():
             ("/set_feedback", "/ds4/from_pc"),
         ],
         respawn=True,
+    )
+
+    rviz2 = Node(
+        package="rviz2",
+        executable="rviz2",
+        name="rviz2",
+        # fmt: off
+        arguments=["-d",os.path.join(path_config,"robot.rviz"),
+                   "--ros-args","--log-level","error",]
+        # fmt: on
     )
 
     # ============================ Nav2 ==================================
@@ -259,6 +270,12 @@ def generate_launch_description():
         executable='master',
         name='master',
         output='screen',
+        parameters=[
+            {
+                "motor_meter_to_pulse": 150.00,
+                "motor_radian_to_pulse": 25.00,
+            }
+        ],
         respawn=True,
         prefix='nice -n -10',
     )
@@ -279,17 +296,33 @@ def generate_launch_description():
 
     return LaunchDescription(
         [
+            tf_base_link_to_camera_link,
+            tf_base_link_to_lidar_link,
             # rosapi_node,
             # ui_server,
             # rosbridge_server, 
 
             # telemetry,
 
+            io_lslidar_n301,
+
             master,
 
             # keyboard_input,
+            io_stm32,
+            ds4_driver_node,
 
             # wifi_control,
+
+            realsense2_camera_node,
+            imu_filter_madgwick_node,
+
+            TimerAction(
+                period=2.0,
+                actions=[
+                    rviz2,
+                ],
+            ),
 
             TimerAction(
                 period=10.0,

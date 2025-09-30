@@ -14,6 +14,7 @@ set(var_dependencies
     ros2_utils
     ros2_interface
     tf2_geometry_msgs
+    ds4_driver_msgs
     tf2_ros)
     
 foreach(var_dependency ${var_dependencies})
@@ -23,7 +24,7 @@ endforeach()
 include_directories(include)
 
 add_executable(master src/master.cpp src/master_definition.cpp)
-ament_target_dependencies(master rclcpp std_msgs ros2_utils)
+ament_target_dependencies(master ${var_dependencies})
 
 install(TARGETS
   master
